@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: labtrack-postgres
+    environment:
+      POSTGRES_DB: labtrack
+      POSTGRES_USER: labtrack
+      POSTGRES_PASSWORD: labtrack_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - labtrack_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U labtrack -d labtrack"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  labtrack_pgdata:

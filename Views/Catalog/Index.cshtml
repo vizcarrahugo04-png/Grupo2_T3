@@ -1,0 +1,51 @@
+@model CatalogViewModel
+@{
+    ViewData["Title"] = "Catálogo de equipos";
+}
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">INVENTARIO</span>
+        <h1>Catálogo de equipos</h1>
+        <p>Encuentra materiales disponibles para tu próxima práctica.</p>
+    </div>
+    <a class="btn btn-outline" asp-controller="Reservations" asp-action="Index">Mis reservas</a>
+</section>
+<nav class="filter-tabs" aria-label="Filtrar equipos por categoría">
+    <a class="@(Model.Category is null ? "active" : "")" asp-action="Index">Todos</a>
+    @foreach (var category in EquipmentCategories.All)
+    {
+        <a class="@(Model.Category == category ? "active" : "")" asp-action="Index" asp-route-categoria="@category">@category</a>
+    }
+</nav>
+
+@if (Model.Equipments.Count == 0)
+{
+    <div class="empty-state panel"><div class="empty-icon">⌕</div><h2>No hay equipos disponibles en esta categoría</h2><p>Prueba con otra categoría para ver más equipos.</p><a class="btn btn-outline" asp-action="Index">Ver todos</a></div>
+}
+else
+{
+    <p class="result-count">@Model.Equipments.Count equipo(s) encontrados</p>
+    <div class="equipment-grid">
+        @foreach (var equipment in Model.Equipments)
+        {
+            <article class="equipment-card">
+                <div class="equipment-visual" aria-hidden="true">
+                    <span class="equipment-symbol">@(equipment.Category == EquipmentCategories.Computing ? "▣" : equipment.Category == EquipmentCategories.Electronics ? "⌁" : "◈")</span>
+                </div>
+                <div class="equipment-body">
+                    <div class="equipment-meta"><span>@equipment.Category</span><span class="status @(equipment.IsBorrowed ? "rejected" : "approved")">@(equipment.IsBorrowed ? "Prestado" : "Disponible")</span></div>
+                    <h2>@equipment.Name</h2>
+                    <p>Código: @equipment.InventoryCode</p>
+                    @if (!equipment.IsBorrowed)
+                    {
+                        <a class="btn btn-primary btn-full" asp-controller="Reservations" asp-action="Create" asp-route-equipoId="@equipment.Id">Reservar equipo <span aria-hidden="true">→</span></a>
+                    }
+                    else
+                    {
+                        <span class="btn btn-disabled btn-full" aria-disabled="true">Actualmente prestado</span>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+}

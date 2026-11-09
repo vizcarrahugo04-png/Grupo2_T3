@@ -1,0 +1,36 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="auth-page">
+    <div class="auth-intro">
+        <span class="eyebrow">LABORATORIO UNIVERSITARIO</span>
+        <h1>Todo tu laboratorio,<br /><span class="muted-heading">en un solo lugar.</span></h1>
+        <p>Encuentra equipos, solicita horarios y sigue tus reservas desde una plataforma sencilla.</p>
+        <div class="auth-features">
+            <span><span class="feature-dot"></span> Disponibilidad de equipos</span>
+            <span><span class="feature-dot"></span> Reservas por horario</span>
+            <span><span class="feature-dot"></span> Seguimiento en tiempo real</span>
+        </div>
+    </div>
+    <div class="panel auth-panel">
+        <div class="panel-icon" aria-hidden="true">↗</div>
+        <h2>Bienvenido de nuevo</h2>
+        <p class="subtle">Ingresa tus datos para continuar.</p>
+        <form asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" method="post" class="stack-form">
+            <div asp-validation-summary="ModelOnly" class="validation" role="alert"></div>
+            <div>
+                <label asp-for="Code">Código de estudiante o encargado</label>
+                <input asp-for="Code" autocomplete="username" placeholder="Ej. 20260001" />
+                <span asp-validation-for="Code" class="field-error"></span>
+            </div>
+            <div>
+                <label asp-for="Password">Contraseña</label>
+                <input asp-for="Password" autocomplete="current-password" placeholder="Tu contraseña" />
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+            <button class="btn btn-primary btn-full" type="submit">Ingresar <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="login-note">Por seguridad, la cuenta se bloquea 15 minutos después de 3 intentos fallidos.</p>
+    </div>
+</section>

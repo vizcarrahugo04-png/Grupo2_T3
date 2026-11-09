@@ -1,0 +1,52 @@
+@model List<Reservation>
+@{
+    ViewData["Title"] = "Mis reservas";
+}
+<section class="page-heading">
+    <div><span class="eyebrow">SEGUIMIENTO</span><h1>Mis reservas</h1><p>Consulta el estado y los horarios de tus solicitudes.</p></div>
+    <a class="btn btn-primary" asp-action="Create">+ Nueva reserva</a>
+</section>
+<section class="panel">
+    <div class="section-heading"><div><span class="eyebrow">HISTORIAL</span><h2>Solicitudes registradas</h2></div><span class="count-pill">@Model.Count en total</span></div>
+    @if (Model.Count == 0)
+    {
+        <div class="quiet-empty"><p>No has realizado ninguna reserva.</p><a class="inline-link" asp-controller="Catalog" asp-action="Index">Ir al catálogo →</a></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table responsive-table">
+                <thead><tr><th>Equipo</th><th>Horario solicitado</th><th>Estado</th><th>Observación</th></tr></thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td data-label="Equipo"><strong>@r.Equipment.Name</strong><small>@r.Equipment.InventoryCode</small></td>
+                            <td data-label="Horario"><span>@(PeruClock.ToLocal(r.StartsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</span><small>Hasta @(PeruClock.ToLocal(r.EndsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</small></td>
+                            <td data-label="Estado">
+                                @if (r.ReturnedAtUtc.HasValue)
+                                {
+                                    <span class="status returned">Devuelta</span>
+                                }
+                                else
+                                {
+                                    <span class="status @r.Status.ToString().ToLowerInvariant()">@StatusLabel(r.Status)</span>
+                                }
+                            </td>
+                            <td data-label="Observación">@(r.RejectionReason ?? (r.ReturnedAtUtc.HasValue ? "Devolución registrada" : "—"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@functions {
+    static string StatusLabel(ReservationStatus status) => status switch
+    {
+        ReservationStatus.Pending => "Pendiente",
+        ReservationStatus.Approved => "Aprobada",
+        _ => "Rechazada"
+    };
+}

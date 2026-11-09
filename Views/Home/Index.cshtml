@@ -1,0 +1,62 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">PANEL DE ESTUDIANTE</span>
+        <h1>Hola, @Model.FullName.Split(' ')[0] <span class="wave" aria-hidden="true">✳</span></h1>
+        <p>Revisa tus equipos, solicitudes y próximos horarios.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Reservations" asp-action="Create">+ Nueva reserva</a>
+</section>
+
+@if (Model.IsPenalized)
+{
+    <div class="flash flash-error" role="alert">Tu cuenta está penalizada por una devolución tardía. Contacta al encargado para regularizar tu situación.</div>
+}
+
+<section class="stat-grid" aria-label="Resumen del laboratorio">
+    <article class="stat-card"><span>Equipos disponibles</span><strong>@Model.AvailableEquipment</strong><small>Para explorar ahora</small></article>
+    <article class="stat-card"><span>Solicitudes pendientes</span><strong>@Model.PendingCount</strong><small>Esperando aprobación</small></article>
+    <article class="stat-card"><span>Reservas aprobadas</span><strong>@Model.ApprovedCount</strong><small>Sin devolución registrada</small></article>
+</section>
+
+<section class="split-layout">
+    <div class="panel">
+        <div class="section-heading"><div><span class="eyebrow">ACTIVIDAD RECIENTE</span><h2>Últimas reservas</h2></div><a class="inline-link" asp-controller="Reservations" asp-action="Index">Ver todas →</a></div>
+        @if (Model.RecentReservations.Count == 0)
+        {
+            <div class="quiet-empty"><p>Todavía no tienes solicitudes registradas.</p><a class="inline-link" asp-controller="Catalog" asp-action="Index">Explorar equipos →</a></div>
+        }
+        else
+        {
+            <div class="activity-list">
+                @foreach (var reservation in Model.RecentReservations)
+                {
+                    <div class="activity-item">
+                        <span class="item-glyph" aria-hidden="true">▣</span>
+                        <div><strong>@reservation.Equipment.Name</strong><small>@(PeruClock.ToLocal(reservation.StartsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</small></div>
+                        <span class="status @reservation.Status.ToString().ToLowerInvariant()">@StatusLabel(reservation.Status)</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <div class="panel accent-panel">
+        <div class="panel-icon">⌁</div>
+        <span class="eyebrow">ENCUENTRA LO QUE NECESITAS</span>
+        <h2>¿Listo para tu próxima práctica?</h2>
+        <p>Explora el inventario de Cómputo, Electrónica y Redes y solicita el equipo que necesitas.</p>
+        <a class="btn btn-secondary" asp-controller="Catalog" asp-action="Index">Explorar catálogo <span aria-hidden="true">↗</span></a>
+    </div>
+</section>
+
+@functions {
+    static string StatusLabel(ReservationStatus status) => status switch
+    {
+        ReservationStatus.Pending => "Pendiente",
+        ReservationStatus.Approved => "Aprobada",
+        _ => "Rechazada"
+    };
+}

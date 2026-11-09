@@ -1,0 +1,60 @@
+@model ReservationCreateViewModel
+@{
+    ViewData["Title"] = "Nueva reserva";
+}
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">SOLICITUD</span>
+        <h1>Reservar equipo</h1>
+        <p>Selecciona un equipo y define el horario exacto de uso.</p>
+    </div>
+    <a class="btn btn-outline" asp-controller="Catalog" asp-action="Index">← Volver al catálogo</a>
+</section>
+
+<div class="form-layout">
+    <section class="panel">
+        <div class="section-heading"><div><span class="eyebrow">DATOS DE LA RESERVA</span><h2>Nueva solicitud</h2></div></div>
+        @if (Model.Equipments.Count == 0)
+        {
+            <div class="flash flash-error" role="alert">No hay equipos disponibles actualmente. Vuelve al catálogo más tarde.</div>
+        }
+        <form asp-action="Create" method="post" class="stack-form">
+            <div asp-validation-summary="All" class="validation" role="alert"></div>
+            <div>
+                <label asp-for="EquipmentId">Equipo</label>
+                <select asp-for="EquipmentId" required>
+                    <option value="">Selecciona un equipo</option>
+                    @foreach (var equipment in Model.Equipments)
+                    {
+                        <option value="@equipment.Id">@equipment.Label</option>
+                    }
+                </select>
+                <span asp-validation-for="EquipmentId" class="field-error"></span>
+            </div>
+            <div class="form-two-cols">
+                <div>
+                    <label asp-for="StartsLocal">Fecha y hora de inicio</label>
+                    <input type="datetime-local" id="StartsLocal" name="StartsLocal" value="@Model.StartsLocal.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+                <div>
+                    <label asp-for="EndsLocal">Fecha y hora de fin</label>
+                    <input type="datetime-local" id="EndsLocal" name="EndsLocal" value="@Model.EndsLocal.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+            </div>
+            <div class="form-footer">
+                <a class="btn btn-outline" asp-controller="Reservations" asp-action="Index">Cancelar</a>
+                <button type="submit" class="btn btn-primary" disabled="@(Model.Equipments.Count == 0)">Enviar solicitud <span aria-hidden="true">→</span></button>
+            </div>
+        </form>
+    </section>
+    <aside class="panel help-panel">
+        <span class="eyebrow">ANTES DE RESERVAR</span>
+        <h2>¿Cómo funciona?</h2>
+        <ol class="step-list">
+            <li><span>01</span><div><strong>Elige tu equipo</strong><p>Selecciona uno que figure como disponible.</p></div></li>
+            <li><span>02</span><div><strong>Indica el horario</strong><p>Los horarios superpuestos no están permitidos.</p></div></li>
+            <li><span>03</span><div><strong>Espera la aprobación</strong><p>El encargado revisará tu solicitud.</p></div></li>
+        </ol>
+        <div class="fine-print">Las horas se interpretan en la zona horaria de Perú (UTC−5).</div>
+    </aside>
+</div>

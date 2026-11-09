@@ -1,0 +1,82 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Administración";
+}
+<section class="page-heading">
+    <div><span class="eyebrow">PANEL DEL ENCARGADO</span><h1>Administración</h1><p>Aprueba solicitudes, controla préstamos y registra devoluciones.</p></div>
+    <span class="date-chip">@(PeruClock.ToLocal(DateTime.UtcNow).ToString("dd/MM/yyyy"))</span>
+</section>
+<section class="stat-grid" aria-label="Resumen administrativo">
+    <article class="stat-card"><span>Por revisar</span><strong>@Model.PendingCount</strong><small>Solicitudes pendientes</small></article>
+    <article class="stat-card"><span>En préstamo</span><strong>@Model.ActiveLoanCount</strong><small>Pendientes de devolución</small></article>
+    <article class="stat-card"><span>Penalizados</span><strong>@Model.PenalizedCount</strong><small>Estudiantes con atraso</small></article>
+</section>
+
+<section class="panel content-section" id="solicitudes">
+    <div class="section-heading"><div><span class="eyebrow">BANDEJA DE ENTRADA</span><h2>Solicitudes pendientes</h2></div><span class="count-pill">@Model.PendingCount pendientes</span></div>
+    @if (Model.PendingReservations.Count == 0)
+    {
+        <div class="quiet-empty"><p>No hay solicitudes pendientes por revisar.</p></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table responsive-table">
+                <thead><tr><th>Estudiante</th><th>Equipo</th><th>Horario solicitado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                    @foreach (var r in Model.PendingReservations)
+                    {
+                        <tr>
+                            <td data-label="Estudiante"><strong>@r.Student.FullName</strong><small>@r.Student.StudentCode</small></td>
+                            <td data-label="Equipo"><strong>@r.Equipment.Name</strong><small>@r.Equipment.InventoryCode</small></td>
+                            <td data-label="Horario"><span>@(PeruClock.ToLocal(r.StartsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</span><small>Hasta @(PeruClock.ToLocal(r.EndsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</small></td>
+                            <td data-label="Acciones" class="actions-cell">
+                                <form asp-action="Approve" asp-route-id="@r.Id" method="post">
+                                    <button type="submit" class="btn btn-small btn-primary">Aprobar</button>
+                                </form>
+                                <form asp-action="Reject" asp-route-id="@r.Id" method="post" class="reject-form">
+                                    <label class="sr-only" for="reason-@r.Id">Motivo de rechazo</label>
+                                    <input id="reason-@r.Id" name="reason" type="text" placeholder="Motivo del rechazo" minlength="3" maxlength="300" required />
+                                    <button type="submit" class="btn btn-small btn-outline-danger">Rechazar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<section class="panel content-section" id="devoluciones">
+    <div class="section-heading"><div><span class="eyebrow">CONTROL DE EQUIPOS</span><h2>Préstamos por devolver</h2></div><span class="count-pill">@Model.ActiveLoanCount activos</span></div>
+    @if (Model.ActiveLoans.Count == 0)
+    {
+        <div class="quiet-empty"><p>Todos los equipos prestados han sido devueltos.</p></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data-table responsive-table">
+                <thead><tr><th>Estudiante</th><th>Equipo</th><th>Fecha límite</th><th>Devolución</th></tr></thead>
+                <tbody>
+                    @foreach (var r in Model.ActiveLoans)
+                    {
+                        <tr>
+                            <td data-label="Estudiante"><strong>@r.Student.FullName</strong><small>@r.Student.StudentCode</small></td>
+                            <td data-label="Equipo"><strong>@r.Equipment.Name</strong><small>@r.Equipment.InventoryCode</small></td>
+                            <td data-label="Límite"><span>@(PeruClock.ToLocal(r.EndsAtUtc).ToString("dd/MM/yyyy · HH:mm"))</span>
+                                @if (r.EndsAtUtc < DateTime.UtcNow) { <small class="text-danger">Vencido · se aplicará penalización</small> }
+                            </td>
+                            <td data-label="Devolución">
+                                <form asp-action="Return" asp-route-id="@r.Id" method="post">
+                                    <button type="submit" class="btn btn-small btn-primary">Marcar devolución</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
