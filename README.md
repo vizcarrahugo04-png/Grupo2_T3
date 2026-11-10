@@ -1,45 +1,6 @@
 # LabTrack
 
-Aplicación académica de préstamo de equipos de laboratorio, basada en las cinco historias de usuario del documento suministrado. Implementada con **ASP.NET Core MVC, C#, Razor, Entity Framework Core y PostgreSQL**. Interfaz minimalista y adaptable a celular, tableta y escritorio.
-
-## Requisitos
-
-- SDK **.NET 10**.
-- **PostgreSQL 17**; puedes usar Docker para levantar la base local.
-- Visual Studio 2026, VS Code o cualquier editor de C#.
-
-## Ejecución rápida
-
-Desde la carpeta `LabTrack`:
-
-1. Inicia PostgreSQL:
-
-   ```bash
-   docker compose up -d
-   ```
-
-2. Restaura y ejecuta:
-
-   ```bash
-   dotnet restore
-   dotnet run --launch-profile https
-   ```
-
-3. Abre **https://localhost:7048**. Si tu equipo no confía en el certificado local, ejecuta `dotnet dev-certs https --trust`.
-
-Al iniciar, la aplicación crea automáticamente las tablas si todavía no existen. PostgreSQL debe tener creada la base `labtrack` (Docker Compose lo hace automáticamente).
-
-### Usuarios de demostración
-
-Solo se generan en entorno `Development` y en una base vacía:
-
-| Rol | Código | Contraseña |
-| --- | --- | --- |
-| Estudiante | `20260001` | `Demo123*` |
-| Estudiante | `20260002` | `Demo123*` |
-| Encargado | `LAB001` | `Demo123*` |
-
-Se agregan seis equipos de ejemplo repartidos entre Cómputo, Electrónica y Redes. Las contraseñas se almacenan con hash de ASP.NET Core Identity, nunca en texto plano.
+Aplicación académica de préstamo de equipos de laboratorio, basada en las cinco historias de usuario del documento suministrado. Implementada con **ASP.NET Core MVC, C#, Razor, Entity Framework Core y PostgreSQL**.
 
 ## Historias de usuario implementadas
 
@@ -76,20 +37,3 @@ LabTrack/
 └── Program.cs         Configuración de la aplicación
 ```
 
-## Usar otra base PostgreSQL
-
-En desarrollo, modifica `ConnectionStrings:PostgreSQL` de `appsettings.Development.json` o usa una variable de entorno:
-
-```bash
-ConnectionStrings__PostgreSQL="Host=SERVIDOR;Port=5432;Database=labtrack;Username=USUARIO;Password=CLAVE" dotnet run
-```
-
-No subas contraseñas reales a un repositorio. En producción configura la cadena por variable de entorno o gestor de secretos.
-
-## Consideraciones antes de desplegar en producción
-
-Esta es una **versión académica funcional / MVP**, no un sistema universitario listo para exposición pública. Para producción faltan la integración con el padrón real de alumnos, gestión de usuarios/contraseñas, auditoría, recuperación de acceso, políticas de penalización configurables, copias de seguridad, protección contra ataques distribuidos y migraciones de EF Core. El proyecto usa `EnsureCreated` para su primera base; si el esquema evoluciona, conviene migrarlo a un flujo de `dotnet ef migrations`.
-
-## Pruebas
-
-Consulta [docs/Casos-de-prueba.md](docs/Casos-de-prueba.md) para casos manuales HU-01 a HU-05 y una guía de carga del catálogo con JMeter.
