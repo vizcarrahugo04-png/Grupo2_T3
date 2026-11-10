@@ -45,8 +45,10 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DbInitializer.InitializeAsync(db, app.Environment.IsDevelopment());
+    // Forzamos un 'true' para que Railway inserte los usuarios y equipos de prueba
+    await DbInitializer.InitializeAsync(db, true);
 }
+
 
 app.MapControllerRoute(
     name: "default",
