@@ -19,7 +19,7 @@ public static class DbInitializer
             {
                 new AppUser { StudentCode = "N00239363", FullName = "Hugo Cruzado", Role = UserRoles.Student },
                 new AppUser { StudentCode = "N00348614", FullName = "Marco Castillo", Role = UserRoles.Student },
-                new AppUser { StudentCode = "Admin", FullName = "Encargado de laboratorio", Role = UserRoles.Admin }
+                new AppUser { StudentCode = "ADMIN", FullName = "Encargado de laboratorio", Role = UserRoles.Admin }
             };
             var hasher = new PasswordHasher<AppUser>();
             foreach (var user in users)
